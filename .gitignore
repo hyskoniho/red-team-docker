@@ -15,6 +15,7 @@ venv.bak/
 # Project specific
 workdir/*
 !workdir/.gitkeep
+!workdir/example-prompt.md
 config/gemini-cli/*
 !config/gemini-cli/.gitkeep
 

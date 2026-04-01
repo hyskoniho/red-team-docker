@@ -2,7 +2,7 @@ services:
   hexstrike-ai:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: pentest-lab/Dockerfile
     container_name: hexstrike_gemini_lab
     image: mvp-hex-ai:latest
     
