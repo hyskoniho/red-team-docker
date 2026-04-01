@@ -22,7 +22,7 @@ services:
       
       # Persistência das configurações (API Keys, preferências do Gemini-CLI)
       # No Linux/Mac, o Gemini-CLI costuma salvar em ~/.config/
-      - ./config/gemini-cli:/root/.config/gemini-terminator
+      - ./pentest-lab/config/gemini-cli:/root/.config/gemini-terminator
 
     environment:
       - TERM=xterm-256color # Garante que as cores do terminal funcionem bem
