@@ -22,7 +22,7 @@ WORKDIR /home/user
 
 # Configurar VNC senha
 RUN mkdir -p /home/user/.vnc && \
-    echo "1234" | vncpasswd -f > /home/user/.vnc/passwd && \
+    echo "hexstrike" | vncpasswd -f > /home/user/.vnc/passwd && \
     chmod 600 /home/user/.vnc/passwd
 
 # Script de inicialização
@@ -30,7 +30,7 @@ RUN echo '#!/bin/bash\n\
 export DISPLAY=:1\n\
 \n\
 # inicia VNC\n\
-vncserver :1 -geometry 1280x800 -depth 24\n\
+vncserver :1 -geometry 1280x800 -depth 24 -SecurityTypes None\n\
 \n\
 # inicia noVNC\n\
 websockify --web=/usr/share/novnc/ 6080 localhost:5901\n\
