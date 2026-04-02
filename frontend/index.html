@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PENTEST HUB // V1.0</title>
+    <title>PENTEST HUB // V2.0</title>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -17,50 +17,99 @@
                 <span class="blink"></span>
                 <span>SYSTEM: ONLINE</span>
             </div>
-            <div class="status-item" id="clock">
-                CLOCK: 00:00:00
-            </div>
-            <div class="status-item">
-                NODE: RED_TEAM_ALPHA
-            </div>
+            <div class="status-item" id="clock">CLOCK: 00:00:00</div>
+            <div class="status-item">NODE: RED_TEAM_ALPHA</div>
         </div>
     </header>
 
-    <main>
-        <!-- Panel 1: Main GUI (VNC) -->
-        <div class="panel panel-vnc">
-            <div class="panel-header">
-                <span>Pentest GUI // Desktop</span>
-                <span>ID: GUI-01</span>
-            </div>
-            <div class="panel-content">
-                <iframe src="http://localhost:6080/vnc.html"></iframe>
-            </div>
-            <div class="scanline"></div>
-        </div>
+    <div class="scroll-container">
+        <!-- SECTION 1: MAIN OPERATIONS -->
+        <section class="section">
+            <div class="grid-sec1">
+                <!-- Panel 1: Main GUI (VNC) -->
+                <div class="panel panel-vnc">
+                    <div class="panel-header">
+                        <span>Pentest GUI // Desktop</span>
+                        <span>ID: GUI-01</span>
+                    </div>
+                    <div class="panel-content">
+                        <iframe src="http://localhost:6080/vnc.html"></iframe>
+                    </div>
+                    <div class="scanline"></div>
+                </div>
 
-        <!-- Panel 2: Terminal -->
-        <div class="panel">
-            <div class="panel-header">
-                <span>Secure Terminal // TTYD</span>
-                <span>ID: TERM-01</span>
+                <!-- Panel 2: File System -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span>Data Bridge // Files</span>
+                        <span>ID: DATA-01</span>
+                    </div>
+                    <div class="panel-content">
+                        <iframe src="http://localhost:8081"></iframe>
+                    </div>
+                </div>
             </div>
-            <div class="panel-content">
-                <iframe src="http://localhost:7681"></iframe>
-            </div>
-        </div>
+        </section>
 
-        <!-- Panel 3: File System -->
-        <div class="panel">
-            <div class="panel-header">
-                <span>Data Bridge // Files</span>
-                <span>ID: DATA-01</span>
+        <!-- SECTION 2: COMMAND & MONITORING -->
+        <section class="section">
+            <div class="grid-sec2">
+                <!-- Terminals Row -->
+                <div class="terminals-row">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Secure Terminal A // TTYD</span>
+                            <span>ID: TERM-01</span>
+                        </div>
+                        <div class="panel-content">
+                            <iframe src="http://localhost:7681"></iframe>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>Secure Terminal B // TTYD</span>
+                            <span>ID: TERM-02</span>
+                        </div>
+                        <div class="panel-content">
+                            <iframe src="http://localhost:7681"></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Stats Row -->
+                <div class="monitor-row">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <span>System Resource Monitor // DOCKER_STATS</span>
+                            <span>ID: CTRL-01</span>
+                        </div>
+                        <div class="panel-content stats-monitor">
+                            <div class="stat-card">
+                                <span class="stat-label">CPU LOAD</span>
+                                <div class="stat-value" id="cpu-val">42.5%</div>
+                                <div class="stat-bar"><div class="stat-level" style="width: 42%;"></div></div>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">MEMORY USAGE</span>
+                                <div class="stat-value" id="mem-val">1.2GB / 8GB</div>
+                                <div class="stat-bar"><div class="stat-level" style="width: 15%;"></div></div>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">DISK OPS</span>
+                                <div class="stat-value" id="disk-val">124 MB/s</div>
+                                <div class="stat-bar"><div class="stat-level" style="width: 28%;"></div></div>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">NETWORK TRAFFIC</span>
+                                <div class="stat-value" id="net-val">1.2 Gbps</div>
+                                <div class="stat-bar"><div class="stat-level" style="width: 75%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="panel-content">
-                <iframe src="http://localhost:8081"></iframe>
-            </div>
-        </div>
-    </main>
+        </section>
+    </div>
 
     <script>
         // --- Matrix Digital Rain ---
@@ -70,52 +119,46 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
-        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const nums = '0123456789';
-        const alphabet = katakana + latin + nums;
-
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピ';
         const fontSize = 16;
         const columns = canvas.width / fontSize;
         const drops = [];
 
-        for (let x = 0; x < columns; x++) {
-            drops[x] = 1;
-        }
+        for (let x = 0; x < columns; x++) drops[x] = 1;
 
         function drawMatrix() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = '#ff3131'; // Red Color
+            ctx.fillStyle = '#ff3131'; 
             ctx.font = fontSize + 'px monospace';
-
             for (let i = 0; i < drops.length; i++) {
                 const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             }
         }
-
         setInterval(drawMatrix, 35);
+
+        // --- Clock & Random Stats Simulation ---
+        function updateUI() {
+            // Clock
+            const now = new Date();
+            document.getElementById('clock').innerText = 'CLOCK: ' + now.toTimeString().split(' ')[0];
+
+            // Random stats wiggle
+            if(Math.random() > 0.7) {
+                const cpu = Math.floor(Math.random() * 80 + 10);
+                document.getElementById('cpu-val').innerText = cpu + '%';
+                document.querySelector('#cpu-val + .stat-bar .stat-level').style.width = cpu + '%';
+            }
+        }
+        setInterval(updateUI, 1000);
 
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
-
-        // --- Clock Update ---
-        function updateClock() {
-            const now = new Date();
-            const time = now.toTimeString().split(' ')[0];
-            document.getElementById('clock').innerText = 'CLOCK: ' + time;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
     </script>
 </body>
 </html>

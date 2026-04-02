@@ -13,17 +13,32 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) transparent;
 }
 
 body {
     background-color: var(--bg-dark);
     color: var(--accent);
     font-family: var(--font-main);
+    overflow: hidden; /* Manage scrolling via container */
+}
+
+/* Scroll Snap Container */
+.scroll-container {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+}
+
+.section {
     height: 100vh;
     width: 100vw;
-    overflow: hidden;
+    scroll-snap-align: start;
     display: flex;
     flex-direction: column;
+    padding-top: 60px; /* Space for fixed header */
+    padding-bottom: 20px;
 }
 
 /* Matrix Canvas Background */
@@ -34,20 +49,23 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    opacity: 0.3;
+    opacity: 0.2;
 }
 
-/* Header / HUD */
+/* Fixed Header */
 header {
     height: 60px;
-    background: linear-gradient(180deg, rgba(255, 0, 0, 0.1) 0%, transparent 100%);
+    width: 100%;
+    background: linear-gradient(180deg, rgba(255, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.5) 100%);
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 2rem;
-    backdrop-filter: blur(5px);
-    z-index: 10;
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    position: fixed;
+    top: 0;
 }
 
 .logo {
@@ -84,31 +102,20 @@ header {
     50% { opacity: 0.3; }
 }
 
-/* Dashboard Layout */
-main {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 15px;
-    padding: 15px;
-    z-index: 1;
-}
-
-/* Iframe Containers */
+/* Panels */
 .panel {
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
     position: relative;
     overflow: hidden;
-    backdrop-filter: blur(10px);
-    transition: border-color 0.3s;
+    backdrop-filter: blur(15px);
+    display: flex;
+    flex-direction: column;
 }
 
 .panel:hover {
     border-color: var(--accent);
-    box-shadow: inset 0 0 15px rgba(255, 0, 0, 0.1);
 }
 
 .panel-header {
@@ -124,7 +131,7 @@ main {
 }
 
 .panel-content {
-    height: calc(100% - 30px);
+    flex: 1;
     width: 100%;
 }
 
@@ -135,12 +142,94 @@ iframe {
     background: transparent;
 }
 
-/* Layout Management */
-.panel-vnc {
-    grid-row: span 2;
+/* SECTION 1: Operação Alpha */
+.grid-sec1 {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 15px;
+    padding: 15px;
 }
 
-/* Glitch Effect on Logo */
+/* SECTION 2: Command Center */
+.grid-sec2 {
+    flex: 1;
+    display: grid;
+    grid-template-rows: 1.5fr 1fr;
+    gap: 15px;
+    padding: 15px;
+}
+
+.terminals-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.monitor-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    height: 100%;
+}
+
+/* Stats Monitor UI */
+.stats-monitor {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 20px;
+    height: 100%;
+}
+
+.stat-card {
+    border-left: 2px solid var(--accent);
+    padding-left: 15px;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.stat-bar {
+    height: 4px;
+    background: rgba(255, 49, 49, 0.1);
+    margin-top: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-level {
+    height: 100%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    width: 60%;
+}
+
+/* Decorations */
+.scanline {
+    width: 100%;
+    height: 100px;
+    z-index: 5;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
+    opacity: 0.1;
+    position: absolute;
+    bottom: 100%;
+    animation: scanline 6s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes scanline {
+    0% { bottom: 100%; }
+    100% { bottom: -100px; }
+}
+
 .glitch {
     position: relative;
 }
@@ -161,22 +250,4 @@ iframe {
 @keyframes noise-anim {
     0% { clip: rect(10px, 9999px, 80px, 0); }
     100% { clip: rect(40px, 9999px, 30px, 0); }
-}
-
-/* Scanning Line */
-.scanline {
-    width: 100%;
-    height: 100px;
-    z-index: 5;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
-    opacity: 0.1;
-    position: absolute;
-    bottom: 100%;
-    animation: scanline 6s linear infinite;
-}
-
-@keyframes scanline {
-    0% { bottom: 100%; }
-    80% { bottom: -100px; }
-    100% { bottom: -100px; }
 }
