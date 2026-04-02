@@ -105,22 +105,47 @@ def complete_install():
         print("\n[!] Setup failed. Please check the logs above.")
         input("\nPress Enter to return to menu...")
 
+def reset_setup():
+    print("\n[!] WARNING: This will stop all containers and remove the setup marker.")
+    confirm = input("[?] Are you sure you want to reset the setup? (y/N): ").lower()
+    if confirm == 'y':
+        print("[*] Stopping containers...")
+        run_command("docker compose down", shell=True)
+        if os.path.exists(MARKER_FILE):
+            os.remove(MARKER_FILE)
+        print("[+] Setup reset successfully.")
+        time.sleep(1)
+        return True
+    return False
+
 def main():
-    # Check if project is already active or setup was done
-    active = check_project_active()
-    setup_done = check_setup_done()
-
-    if active and setup_done:
-        print("========================================")
-        print("   Red Team Docker - AI Pentest Lab     ")
-        print("========================================")
-        print("\n[*] Project is already active and setup was completed previously.")
-        print("[*] Would you like to enter the lab terminal? (y/n)")
-        if input("> ").lower() == 'y':
-            subprocess.run("docker exec -it hexstrike_gemini_lab /bin/bash", shell=True)
-            return
-
     while True:
+        # Check if project is already active or setup was done
+        active = check_project_active()
+        setup_done = check_setup_done()
+
+        if active and setup_done:
+            clear_screen()
+            print("========================================")
+            print("   Red Team Docker - AI Pentest Lab     ")
+            print("========================================")
+            print("\n[*] Project is already active and setup was completed previously.")
+            print("\nOptions:")
+            print("1. Enter Lab Terminal")
+            print("2. Reset/Override Setup (Fresh Install)")
+            print("Q. Quit")
+            
+            choice = input("\nYour choice: ").strip().lower()
+            if choice == '1':
+                subprocess.run("docker exec -it hexstrike_gemini_lab /bin/bash", shell=True)
+                return
+            elif choice == '2':
+                if reset_setup():
+                    continue # Re-run loop to show main menu
+            elif choice == 'q':
+                sys.exit(0)
+            continue
+
         choice = main_menu()
         if choice == '1':
             simple_install()
