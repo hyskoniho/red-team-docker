@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: pentest-lab/Dockerfile
+      args:
+        INSTALL_GUI: "${INSTALL_GUI:-false}"
     container_name: hexstrike_gemini_lab
     image: mvp-hex-ai:latest
     
@@ -11,6 +13,7 @@ services:
     
     # Host network: container sees the SAME network as your machine (VPN, WireGuard, etc.)
     # ttyd is served by a separate sidecar container with its own port mapping.
+    # noVNC (port 6080) is also exposed directly via host network when GUI is installed.
     network_mode: host
     
     # Garante interatividade para o comando gemini-cli
@@ -52,10 +55,15 @@ services:
       - ./workdir:/srv
     command: --noauth
 
-  gui:
-    build: ./gui
-    container_name: hexstrike_gui
+  # noVNC sidecar: bridge between Windows host and the host-networked lab
+  # Essential for Windows because 'network_mode: host' doesn't expose ports to localhost.
+  hexstrike-novnc:
+    build: ./novnc
+    container_name: hexstrike_novnc
     ports:
       - "6080:6080"
-    volumes:
-      - ./workdir:/workspace
+    # Connects to the VNC server running in the 'hexstrike_gemini_lab' container (port 5901)
+    # Since hexstrike-ai is in host mode, we reach it via host.docker.internal.
+    entrypoint: ["websockify", "--web=/usr/share/novnc/", "6080", "172.18.0.1:5901"]
+    restart: unless-stopped
+

@@ -55,7 +55,7 @@ def main_menu():
     print("   - Build and start only 'hexstrike-ai' (Gemini Lab)")
     print("   - Automatically connect to the container terminal")
     print("\n2. Complete Install")
-    print("   - Deploy all services (Database, GUI, Files, Terminal)")
+    print("   - Deploy hexstrike with XFCE4 Desktop + noVNC, TTYD, Files")
     print("   - Open the Web Dashboard in your browser")
     print("\nQ. Quit")
     print("\n----------------------------------------")
@@ -84,12 +84,23 @@ def simple_install():
 
 def complete_install():
     print("\n[*] Starting Complete Install...")
+    print("[*] Building hexstrike-ai with XFCE4 + noVNC desktop environment...")
+    
+    # Set the build arg via environment variable (docker-compose interpolates it)
+    os.environ["INSTALL_GUI"] = "true"
+    
+    if not run_command("docker compose build hexstrike-ai", shell=True):
+        print("\n[!] Build failed. Please check the logs above.")
+        input("\nPress Enter to return to menu...")
+        return
+    
     print("[*] Deploying all docker-compose services (including TTYD sidecar)...")
-    if run_command("docker compose up -d --build", shell=True):
+    if run_command("docker compose up -d", shell=True):
         with open(MARKER_FILE, "w") as f:
             f.write(f"Setup completed at {time.ctime()}\n")
         
         print("[+] Success! All services are up.")
+        print("[+] noVNC Desktop available at http://localhost:6080")
         print("[+] TTYD terminal available at http://localhost:7681")
         print("[+] Your host network (VPN, WireGuard, etc.) is shared with the lab.")
 
