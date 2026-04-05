@@ -66,4 +66,13 @@ services:
     # Since hexstrike-ai is in host mode, we reach it via host.docker.internal.
     entrypoint: ["websockify", "--web=/usr/share/novnc/", "6080", "172.18.0.1:5901"]
     restart: unless-stopped
+
+  hexstrike-stats:
+    build: ./stats
+    container_name: hexstrike_stats
+    ports:
+      - "8082:8082"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
 

@@ -83,26 +83,35 @@
                             <span>System Resource Monitor // DOCKER_STATS</span>
                             <span>ID: CTRL-01</span>
                         </div>
-                        <div class="panel-content stats-monitor">
-                            <div class="stat-card">
-                                <span class="stat-label">CPU LOAD</span>
-                                <div class="stat-value" id="cpu-val">42.5%</div>
-                                <div class="stat-bar"><div class="stat-level" style="width: 42%;"></div></div>
+                        <div class="panel-content">
+                            <!-- New Row: Individual Instance Loads -->
+                            <div class="node-stats-container" id="node-list">
+                                <!-- Populated via JS -->
+                                <div class="node-loading">INITIALIZING DATA BRIDGE...</div>
                             </div>
-                            <div class="stat-card">
-                                <span class="stat-label">MEMORY USAGE</span>
-                                <div class="stat-value" id="mem-val">1.2GB / 8GB</div>
-                                <div class="stat-bar"><div class="stat-level" style="width: 15%;"></div></div>
-                            </div>
-                            <div class="stat-card">
-                                <span class="stat-label">DISK OPS</span>
-                                <div class="stat-value" id="disk-val">124 MB/s</div>
-                                <div class="stat-bar"><div class="stat-level" style="width: 28%;"></div></div>
-                            </div>
-                            <div class="stat-card">
-                                <span class="stat-label">NETWORK TRAFFIC</span>
-                                <div class="stat-value" id="net-val">1.2 Gbps</div>
-                                <div class="stat-bar"><div class="stat-level" style="width: 75%;"></div></div>
+                            
+                            <!-- Main Aggregate Cards -->
+                            <div class="stats-monitor">
+                                <div class="stat-card">
+                                    <span class="stat-label">AGGREGATE CPU</span>
+                                    <div class="stat-value" id="cpu-val">0%</div>
+                                    <div class="stat-bar"><div class="stat-level" id="cpu-bar" style="width: 0%;"></div></div>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-label">MEMORY USAGE</span>
+                                    <div class="stat-value" id="mem-val">0 / 0 GB</div>
+                                    <div class="stat-bar"><div class="stat-level" id="mem-bar" style="width: 0%;"></div></div>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-label">NET RX (IN)</span>
+                                    <div class="stat-value" id="disk-val">0 MB</div>
+                                    <div class="stat-bar"><div class="stat-level" id="disk-bar" style="width: 0%;"></div></div>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-label">NET TX (OUT)</span>
+                                    <div class="stat-value" id="net-val">0 MB</div>
+                                    <div class="stat-bar"><div class="stat-level" id="net-bar" style="width: 0%;"></div></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -140,20 +149,54 @@
         }
         setInterval(drawMatrix, 35);
 
-        // --- Clock & Random Stats Simulation ---
-        function updateUI() {
-            // Clock
-            const now = new Date();
-            document.getElementById('clock').innerText = 'CLOCK: ' + now.toTimeString().split(' ')[0];
+        // --- Real Docker Stats Fetching ---
+        async function updateStats() {
+            try {
+                const response = await fetch('http://localhost:8082/stats');
+                const data = await response.json();
+                
+                // 1. Update Aggregate Cards
+                document.getElementById('cpu-val').innerText = data.aggregate.cpu + '%';
+                document.getElementById('cpu-bar').style.width = Math.min(data.aggregate.cpu, 100) + '%';
+                
+                document.getElementById('mem-val').innerText = `${data.aggregate.mem_usage}GB / ${data.aggregate.mem_limit}GB`;
+                document.getElementById('mem-bar').style.width = data.aggregate.mem_percent + '%';
+                
+                document.getElementById('disk-val').innerText = data.aggregate.net_in_mb + ' MB';
+                document.getElementById('disk-bar').style.width = Math.min(data.aggregate.net_in_mb / 10, 100) + '%';
+                
+                document.getElementById('net-val').innerText = data.aggregate.net_out_mb + ' MB';
+                document.getElementById('net-bar').style.width = Math.min(data.aggregate.net_out_mb / 10, 100) + '%';
 
-            // Random stats wiggle
-            if(Math.random() > 0.7) {
-                const cpu = Math.floor(Math.random() * 80 + 10);
-                document.getElementById('cpu-val').innerText = cpu + '%';
-                document.querySelector('#cpu-val + .stat-bar .stat-level').style.width = cpu + '%';
+                // 2. Update Individual Node List
+                const nodeList = document.getElementById('node-list');
+                nodeList.innerHTML = data.individual.map(node => `
+                    <div class="node-row">
+                        <span class="node-status ${node.status}">${node.status}</span>
+                        <span class="node-name">${node.name}</span>
+                        <div class="node-metrics">
+                            <span class="mini-stat">CPU: ${node.cpu}%</span>
+                            <div class="mini-bar"><div class="mini-level" style="width: ${node.cpu}%"></div></div>
+                            <span class="mini-stat">MEM: ${node.mem}%</span>
+                            <div class="mini-bar"><div class="mini-level" style="width: ${node.mem}%"></div></div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                console.error("Stats Fetch Error:", err);
+                document.getElementById('node-list').innerHTML = `<div class="node-error">ERROR: DATA BRIDGE OFFLINE [8082]</div>`;
             }
         }
-        setInterval(updateUI, 1000);
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = 'CLOCK: ' + now.toTimeString().split(' ')[0];
+        }
+
+        setInterval(updateStats, 2000); // Fetch every 2s
+        setInterval(updateClock, 1000);
+        updateStats(); // Initial call
 
         // --- Focus Fix for Terminal Iframes ---
         // Ensures that clicking the terminal panel focuses the iframe for typing
