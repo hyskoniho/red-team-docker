@@ -16,6 +16,7 @@ venv.bak/
 workdir/*
 !workdir/.gitkeep
 !workdir/example-prompt.md
+!workdir/tools.md
 
 # Sensitive VPN files
 *.ovpn
