@@ -7,3 +7,4 @@ There is a list with community tools available to use:
 5. **The Inspector** - https://github.com/Moham3dRiahi/Th3inspector
 6. **Dradis** - https://github.com/dradis/dradis-ce
 7. **Crucix** - https://github.com/calesthio/Crucix
+8. **MCP Brasil** - https://github.com/mcp-brasil/mcp-brasil
